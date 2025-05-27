@@ -1,3 +1,3 @@
 #!/bin/sh
 
-clang -shared -fPIC -o src/SDL3.so src/lua-sdl3-bindings.c -lSDL3
+clang -shared -fPIC -o src/SDL3.so src/lua-sdl3-bindings.c -lSDL3 -lSDL3_ttf
