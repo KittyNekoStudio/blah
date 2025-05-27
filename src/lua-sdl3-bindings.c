@@ -224,44 +224,39 @@ static const struct luaL_Reg sdl_funcs[] = {
 	{"init", lua_sdl_init},
 	{"quit", lua_sdl_quit},
 	{"create_window", lua_sdl_create_window},
+	{"destroy_window", lua_sdl_destroy_window},
 	{"create_renderer", lua_sdl_create_renderer},
+	{"destroy_renderer", lua_sdl_destroy_renderer},
 	{"render_clear", lua_sdl_render_clear},
 	{"render_present", lua_sdl_render_present},
 	{"ttf_init", lua_sdl_ttf_init},
 	{"ttf_quit", lua_sdl_ttf_quit},
 	{"create_text_engine", lua_sdl_ttf_create_renderer_text_engine},
+	{"destroy_text_engine", lua_sdl_ttf_destroy_renderer_text_engine},
 	{"open_font", lua_sdl_ttf_open_font},
+	{"close_font", lua_sdl_ttf_close_font},
 	{"create_text", lua_sdl_ttf_create_text},
+	{"destroy_text", lua_sdl_ttf_destroy_text},
 	{"draw_render_text", lua_sdl_draw_render_text},
 	{NULL, NULL}
 };
 
 int luaopen_SDL3(lua_State *L) {
 	luaL_newmetatable(L, "SDL_Window");
-	lua_pushcfunction(L, lua_sdl_destroy_window);
-	lua_setfield(L, -2, "__gc");
 	lua_pop(L, 1);
 
 	luaL_newmetatable(L, "SDL_Renderer");
-	lua_pushcfunction(L, lua_sdl_destroy_renderer);
-	lua_setfield(L, -2, "__gc");
 	lua_pop(L, 1);
 
 	// TODO! we segfault and I have a feeling it is because we are not handling
 	// destruction ourselves
 	luaL_newmetatable(L, "TTF_TextEngine");
-	lua_pushcfunction(L, lua_sdl_ttf_destroy_renderer_text_engine);
-	lua_setfield(L, -2, "__gc");
 	lua_pop(L, 1);
 
 	luaL_newmetatable(L, "TTF_Font");
-	lua_pushcfunction(L, lua_sdl_ttf_close_font);
-	lua_setfield(L, -2, "__gc");
 	lua_pop(L, 1);
 
 	luaL_newmetatable(L, "TTF_Text");
-	lua_pushcfunction(L, lua_sdl_ttf_destroy_text);
-	lua_setfield(L, -2, "__gc");
 	lua_pop(L, 1);
 
 	luaL_newlib(L, sdl_funcs);
