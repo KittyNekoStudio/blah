@@ -1,11 +1,9 @@
-#include <SDL3/SDL_render.h>
-#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <lua.h>
+#include <lualib.h>
 #include <lauxlib.h>
-#include <SDL3/SDL.h>
-#include <string.h>
-#include <sys/types.h>
+#include <stdio.h>
 
 static int lua_sdl_init(lua_State *L) {
 	int flags = luaL_checkinteger(L, 1);
@@ -223,6 +221,7 @@ int lua_sdl_draw_render_text(lua_State *L) {
 
 int lua_sdl_poll_event(lua_State *L) {
 	SDL_Event event;
+	
 	if (SDL_PollEvent(&event)) {
 		lua_newtable(L);
 		
@@ -235,7 +234,6 @@ int lua_sdl_poll_event(lua_State *L) {
 			lua_pushinteger(L, event.key.scancode);
 			lua_settable(L, -3);
 		}
-
 		return 1;
 	}
 	
@@ -282,5 +280,6 @@ int luaopen_SDL3(lua_State *L) {
 	lua_pop(L, 1);
 
 	luaL_newlib(L, sdl_funcs);
+
 	return 1;
 }
