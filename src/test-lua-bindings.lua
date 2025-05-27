@@ -7,8 +7,10 @@ local window = sdl.create_window("From lua", 1000, 500, 0)
 local renderer = sdl.create_renderer(window)
 local text_engine = sdl.create_text_engine(renderer)
 local font = sdl.open_font("../Anonymous.ttf", 12.0)
-local text_literal = "Hello, World! It is so cool man."
-local text = sdl.create_text(text_engine, font, text_literal, string.len(text_literal))
+
+local file = assert(io.open("test-lua-bindings.lua", "r"))
+local file_contents = file:read("a")
+local text = sdl.create_text(text_engine, font, file_contents, string.len(file_contents))
 
 sdl.render_clear(renderer)
 
@@ -16,8 +18,18 @@ sdl.draw_render_text(text, 100, 100)
 
 sdl.render_present(renderer)
 
-os.execute("sleep " .. 1)
+local running = true
 
+while running do
+	local event = sdl.poll_event()
+	if event then
+		if event.key == 20 then
+			running = false
+		end
+	end
+end
+
+file:close()
 sdl.destroy_text_engine(text_engine)
 sdl.close_font(font)
 sdl.destroy_text(text)

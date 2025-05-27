@@ -1,4 +1,5 @@
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_scancode.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <lua.h>
 #include <lauxlib.h>
@@ -220,6 +221,28 @@ int lua_sdl_draw_render_text(lua_State *L) {
 	return 0;
 }
 
+int lua_sdl_poll_event(lua_State *L) {
+	SDL_Event event;
+	if (SDL_PollEvent(&event)) {
+		lua_newtable(L);
+		
+		lua_pushstring(L, "type");
+		lua_pushinteger(L, event.type);
+		lua_settable(L, -3);
+
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			lua_pushstring(L, "key");
+			lua_pushinteger(L, event.key.scancode);
+			lua_settable(L, -3);
+		}
+
+		return 1;
+	}
+	
+	lua_pushnil(L);
+	return 1;
+}
+
 static const struct luaL_Reg sdl_funcs[] = {
 	{"init", lua_sdl_init},
 	{"quit", lua_sdl_quit},
@@ -238,6 +261,7 @@ static const struct luaL_Reg sdl_funcs[] = {
 	{"create_text", lua_sdl_ttf_create_text},
 	{"destroy_text", lua_sdl_ttf_destroy_text},
 	{"draw_render_text", lua_sdl_draw_render_text},
+	{"poll_event", lua_sdl_poll_event},
 	{NULL, NULL}
 };
 
@@ -248,8 +272,6 @@ int luaopen_SDL3(lua_State *L) {
 	luaL_newmetatable(L, "SDL_Renderer");
 	lua_pop(L, 1);
 
-	// TODO! we segfault and I have a feeling it is because we are not handling
-	// destruction ourselves
 	luaL_newmetatable(L, "TTF_TextEngine");
 	lua_pop(L, 1);
 
