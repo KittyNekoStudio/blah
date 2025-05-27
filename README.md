@@ -2,7 +2,7 @@
 
 blah is a text editor built on top of a terminal emulator.
 
-[Rodamap](/docs/blah-roadmap.md)
+[Roadmap](/docs/blah-roadmap.md)
 
 ## What does blah aim to do?
 
