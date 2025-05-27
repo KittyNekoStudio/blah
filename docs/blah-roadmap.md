@@ -3,7 +3,7 @@ Listed in order of priorities.
 
 # MPV
 - [x]Create a SDL3 window
-- [ ]Render text onto the SDL3 window
+- [x]Render text onto the SDL3 window
 - [ ]Display a file to the window 
 - [ ]Allow the movement of the cursor
 - [ ]Make edits to the file
