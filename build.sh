@@ -1,4 +1,11 @@
 #!/bin/sh
 
-clang -shared -fPIC -o build/SDL3.so src/lua-sdl3-bindings.c -lSDL3 -lSDL3_ttf
-clang src/lua-sdl3-bindings.c src/blah.c -o build/blah -llua -Llib -lSDL3 -lSDL3_ttf
+clang src/c/lua-sdl3-bindings.c src/c/blah.c -o blah -llua -Llib -lSDL3 -lSDL3_ttf
+mv blah blah.AppDir/usr/bin
+cp src/lua -r blah.AppDir/usr/share
+cd build
+ARCH=x86_64 ./appimagetool-x86_64.AppImage ../blah.AppDir blah.AppImage
+
+if [[ $1 == "run" ]]; then
+	./blah.AppImage
+fi

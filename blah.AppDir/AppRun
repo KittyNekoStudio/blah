@@ -1,0 +1,4 @@
+#!/bin/bash
+SELF=$(readlink -f "$0")
+export HERE=${SELF%/*}
+exec "$HERE/usr/bin/blah"
