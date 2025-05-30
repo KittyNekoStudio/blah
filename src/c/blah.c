@@ -1,7 +1,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-# include <stdlib.h>
+#include <stdlib.h>
 
 int luaopen_SDL3(lua_State *L); 
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	lua_pop(L, 2);
 
 	if (luaL_dofile(L, init_script) != LUA_OK) {
-		fprintf(stderr, "Error in dofile test-lua-bindings: %s\n", 
+		fprintf(stderr, "Error in dofile init_script: %s\n",
 					lua_tostring(L, -1));
 		return 1;
 	}

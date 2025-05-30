@@ -78,6 +78,62 @@ static int lua_sdl_destroy_renderer(lua_State *L) {
 	return 0;
 }
 
+static int lua_sdl_create_texture_from_surface(lua_State *L) {
+	SDL_Renderer **renderer = luaL_checkudata(L, 1, "SDL_Renderer");
+	if (!*renderer) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Not a renderer");
+		return 2;
+	}
+
+	SDL_Surface **surface = luaL_checkudata(L, 2, "SDL_Surface");
+	if (!*renderer) {
+			lua_pushnil(L);
+			lua_pushstring(L, "Not a surface");
+			return 2;
+		}
+
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(*renderer, *surface);
+	if (!texture) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
+
+	SDL_Texture **userdata = lua_newuserdata(L, sizeof(SDL_Texture*));
+	*userdata = texture;
+
+	luaL_getmetatable(L, "SDL_Texture");
+	lua_setmetatable(L, -2);
+	return 1;
+}
+
+static int lua_sdl_destroy_texture(lua_State *L) {
+	SDL_Texture **texture = luaL_checkudata(L, 1, "SDL_Texture");
+	if (*texture) {
+		SDL_DestroyTexture(*texture);
+		*texture = NULL;
+	}
+
+	return 0;
+}
+
+static int lua_sdl_create_color(lua_State *L) {
+	uint8_t red = luaL_checknumber(L, 1);
+	uint8_t green = luaL_checknumber(L, 2);
+	uint8_t blue = luaL_checknumber(L, 3);
+	uint8_t alpha = luaL_checknumber(L, 4);
+
+	SDL_Color color = {red, green, blue, alpha};
+
+	SDL_Color *userdata = lua_newuserdata(L, sizeof(SDL_Color));
+	*userdata = color;
+
+	luaL_getmetatable(L, "SDL_Color");
+	lua_setmetatable(L, -2);
+	return 1;
+}
+
 static int lua_sdl_render_clear(lua_State *L) {
 	SDL_Renderer **userdata = luaL_checkudata(L, 1, "SDL_Renderer");
 	SDL_Renderer *renderer = *userdata;
@@ -88,8 +144,78 @@ static int lua_sdl_render_clear(lua_State *L) {
 static int lua_sdl_render_present(lua_State *L) {
 	SDL_Renderer **userdata = luaL_checkudata(L, 1, "SDL_Renderer");
 	SDL_Renderer *renderer = *userdata;
-	SDL_RenderPresent(renderer);
+	if (!SDL_RenderPresent(renderer)) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
 	return 0;
+}
+
+static int lua_sdl_set_render_draw_color(lua_State *L) {
+	SDL_Renderer **renderer = luaL_checkudata(L, 1, "SDL_Renderer");
+	if (!*renderer) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Not a renderer");
+		return 2;
+	}
+
+	SDL_Color *color = luaL_checkudata(L, 2, "SDL_Color");
+
+	if (!SDL_SetRenderDrawColor(*renderer, color->r, color->g, color->b, color->a)) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
+	return 0;
+}
+
+static int lua_sdl_render_texture(lua_State *L) {
+	SDL_Renderer **renderer = luaL_checkudata(L, 1, "SDL_Renderer");
+	if (!*renderer) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Not a renderer");
+		return 2;
+	}
+
+	SDL_Texture **texture = luaL_checkudata(L, 2, "SDL_Texture");
+	if (!*texture) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Not a texture");
+		return 2;
+	}
+	
+
+	SDL_FRect **srcrect;
+	if (lua_isnil(L, 3)) {
+		*srcrect = NULL;
+	} else {
+		srcrect = luaL_checkudata(L, 3, "SDL_FRect");
+	}
+
+	SDL_FRect *dstrect = luaL_checkudata(L, 4, "SDL_FRect");
+	if (!SDL_RenderTexture(*renderer, *texture, *srcrect, dstrect)) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
+	return 0;
+}
+
+static int lua_sdl_create_frect(lua_State *L) {
+	float x = luaL_checknumber(L, 1);
+	float y = luaL_checknumber(L, 2);
+	float w = luaL_checknumber(L, 3);
+	float h = luaL_checknumber(L, 4);
+
+	SDL_FRect frect = {x, y, w, h};
+	
+	SDL_FRect *userdata = lua_newuserdata(L, sizeof(SDL_FRect));
+	*userdata = frect;
+
+	luaL_getmetatable(L, "SDL_FRect");
+	lua_setmetatable(L, -2);
+	return 1;
 }
 
 static int lua_sdl_ttf_init(lua_State *L) {
@@ -104,36 +230,6 @@ static int lua_sdl_ttf_init(lua_State *L) {
 
 static int lua_sdl_ttf_quit(lua_State *L) {
 	TTF_Quit();
-	return 0;
-}
-
-static int lua_sdl_ttf_create_renderer_text_engine(lua_State *L) {
-	SDL_Renderer **renderer = luaL_checkudata(L, 1, "SDL_Renderer");
-
-	TTF_TextEngine *text_engine = TTF_CreateRendererTextEngine(*renderer);
-
-	if (!text_engine) {
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
-	}
-
-	TTF_TextEngine **userdata = lua_newuserdata(L, sizeof(TTF_TextEngine*));
-	*userdata = text_engine;
-
-	luaL_getmetatable(L, "TTF_TextEngine");
-	lua_setmetatable(L, -2);
-	return 1;
-}
-
-static int lua_sdl_ttf_destroy_renderer_text_engine(lua_State *L) {
-	TTF_TextEngine **text_engine = luaL_checkudata(L, 1, "TTF_TextEngine");
-
-	if (*text_engine) {
-		TTF_DestroyRendererTextEngine(*text_engine);
-		*text_engine = NULL;
-	}
-
 	return 0;
 }
 
@@ -167,59 +263,67 @@ static int lua_sdl_ttf_close_font(lua_State *L) {
 	return 0;
 }
 
-static int lua_sdl_ttf_create_text(lua_State *L) {
-	TTF_TextEngine **userdata_engine = luaL_checkudata(L, 1, "TTF_TextEngine");
-	TTF_TextEngine *text_engine = *userdata_engine;
 
-	TTF_Font **userdata_font = luaL_checkudata(L, 2, "TTF_Font");
-	TTF_Font *font = *userdata_font;
+static int lua_sdl_ttf_render_text_blended(lua_State *L) {
+	TTF_Font **font = luaL_checkudata(L, 1, "TTF_Font");
+	if (!font) {
+			lua_pushnil(L);
+			lua_pushstring(L, SDL_GetError());
+			return 2;
+	}
+	const char *text = luaL_checkstring(L, 2);
+	int text_length = luaL_checkinteger(L, 3);
+	SDL_Color *color = luaL_checkudata(L, 4, "SDL_Color");
+	SDL_Surface *surface = TTF_RenderText_Blended(*font, text, text_length, *color);
 
-	const char *text = luaL_checkstring(L, 3);
-	int length = luaL_checkinteger(L, 4);
-
-	TTF_Text *ttf_text = TTF_CreateText(text_engine, font, text, length);
-
-	if (!ttf_text) {
-		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
-		return 2;
+	if (!surface) {
+			lua_pushnil(L);
+			lua_pushstring(L, SDL_GetError());
+			return 2;
 	}
 
-	TTF_Text **userdata = lua_newuserdata(L, sizeof(TTF_Text*));
-	*userdata = ttf_text;
 
-	luaL_getmetatable(L, "TTF_Text");
+	SDL_Surface **userdata = lua_newuserdata(L, sizeof(SDL_Surface*));
+	*userdata = surface;	
+
+	luaL_getmetatable(L, "SDL_Surface");
 	lua_setmetatable(L, -2);
 	return 1;
 }
 
-int lua_sdl_ttf_destroy_text(lua_State *L) {
-	TTF_Text **text = luaL_checkudata(L, 1, "TTF_Text");
+static int lua_sdl_destroy_surface(lua_State *L) {
+	SDL_Surface **surface = luaL_checkudata(L, 1, "SDL_Surface");
 
-	if (*text) {
-		TTF_DestroyText(*text);
-		*text = NULL;
+	if (*surface) {
+		SDL_DestroySurface(*surface);
+		*surface = NULL;
 	}
-
 	return 0;
 }
 
-int lua_sdl_draw_render_text(lua_State *L) {
-	TTF_Text **userdata = luaL_checkudata(L, 1, "TTF_Text");
-	TTF_Text *text = *userdata;
-	float x = luaL_checknumber(L, 2);
-	float y = luaL_checknumber(L, 3);
-
-	if (!TTF_DrawRendererText(text, x, y)) {
+static int lua_sdl_surface_index(lua_State *L) {
+	SDL_Surface **userdata = luaL_checkudata(L, 1, "SDL_Surface");
+	if (!*userdata) {
 		lua_pushnil(L);
-		lua_pushstring(L, SDL_GetError());
+		lua_pushstring(L, "Not a surface");
 		return 2;
 	}
 
+	SDL_Surface *surface = *userdata;
+	const char *key = luaL_checkstring(L, 2);
+
+	if (strcmp(key, "w") == 0) {
+			lua_pushinteger(L, surface->w);
+			return 1;
+	} else if (strcmp(key, "h") == 0) {
+			lua_pushinteger(L, surface->h);
+			return 1;
+	}
+
 	return 0;
 }
 
-int lua_sdl_poll_event(lua_State *L) {
+static int lua_sdl_poll_event(lua_State *L) {
 	SDL_Event event;
 	
 	if (SDL_PollEvent(&event)) {
@@ -234,6 +338,13 @@ int lua_sdl_poll_event(lua_State *L) {
 			lua_pushinteger(L, event.key.scancode);
 			lua_settable(L, -3);
 		}
+
+		if (event.type == SDL_EVENT_QUIT) {
+			lua_pushstring(L, "quit");
+			lua_pushboolean(L, 1);
+			lua_settable(L, -3);
+		}
+
 		return 1;
 	}
 	
@@ -248,18 +359,21 @@ static const struct luaL_Reg sdl_funcs[] = {
 	{"destroy_window", lua_sdl_destroy_window},
 	{"create_renderer", lua_sdl_create_renderer},
 	{"destroy_renderer", lua_sdl_destroy_renderer},
+	{"create_texture_from_surface", lua_sdl_create_texture_from_surface},
+	{"destroy_texture", lua_sdl_destroy_texture},
+	{"blended_text_surface", lua_sdl_ttf_render_text_blended},
+	{"destroy_surface", lua_sdl_destroy_surface},
 	{"render_clear", lua_sdl_render_clear},
 	{"render_present", lua_sdl_render_present},
+	{"render_texture", lua_sdl_render_texture},
+	{"color", lua_sdl_create_color},
+	{"set_draw_color", lua_sdl_set_render_draw_color},
 	{"ttf_init", lua_sdl_ttf_init},
 	{"ttf_quit", lua_sdl_ttf_quit},
-	{"create_text_engine", lua_sdl_ttf_create_renderer_text_engine},
-	{"destroy_text_engine", lua_sdl_ttf_destroy_renderer_text_engine},
 	{"open_font", lua_sdl_ttf_open_font},
 	{"close_font", lua_sdl_ttf_close_font},
-	{"create_text", lua_sdl_ttf_create_text},
-	{"destroy_text", lua_sdl_ttf_destroy_text},
-	{"draw_render_text", lua_sdl_draw_render_text},
 	{"poll_event", lua_sdl_poll_event},
+	{"frect", lua_sdl_create_frect},
 	{NULL, NULL}
 };
 
@@ -270,13 +384,21 @@ int luaopen_SDL3(lua_State *L) {
 	luaL_newmetatable(L, "SDL_Renderer");
 	lua_pop(L, 1);
 
-	luaL_newmetatable(L, "TTF_TextEngine");
+	luaL_newmetatable(L, "SDL_Surface");
+	lua_pushcfunction(L, lua_sdl_surface_index);
+	lua_setfield(L, -2, "__index");
+	lua_pop(L ,1);
+
+	luaL_newmetatable(L, "SDL_Texture");
+	lua_pop(L ,1);
+
+	luaL_newmetatable(L, "SDL_Color");
+	lua_pop(L, 1);
+
+	luaL_newmetatable(L, "SDL_FRect");
 	lua_pop(L, 1);
 
 	luaL_newmetatable(L, "TTF_Font");
-	lua_pop(L, 1);
-
-	luaL_newmetatable(L, "TTF_Text");
 	lua_pop(L, 1);
 
 	luaL_newlib(L, sdl_funcs);
