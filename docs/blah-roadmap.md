@@ -26,7 +26,8 @@ Listed in order of priorities.
 
 ## Customization
 
-- [ ]Make it easy for the creation and use of shaders
+- [ ]Make a simple to use theme creation system
+  -[ ]Include syntax highlighting as well
 - [ ]Add support for changing various editor variables
 - [ ]Add plugin system
 

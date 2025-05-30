@@ -28,7 +28,6 @@ instead of an interpreter.
 blah plans to have:
 
 - A fully featured text editor
-- Use of shaders to spice up graphics
 - Interaction with a shell to run any program you want
 - A robust plugin system to extend blah however you want
 
