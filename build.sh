@@ -21,12 +21,16 @@ if [[ -d build/ ]]; then
 		exit 0
 	fi
 
-	if [[ -f $runtime ]]; then
-		ARCH=x86_64 ./appimagetool-x86_64.AppImage -n --runtime-file runtime-x86_64 ../blah.AppDir blah.AppImage
+	if [[ $appimagetool == "appimagetool-x86_64.AppImage" ]]; then
+		if [[ -f $runtime ]]; then
+			ARCH=x86_64 ./appimagetool-x86_64.AppImage -n --runtime-file runtime-x86_64 ../blah.AppDir blah.AppImage
+		else
+			ARCH=x86_64 ./appimagetool-x86_64.AppImage -n ../blah.AppDir blah.AppImage
+		fi
 	else
-		ARCH=x86_64 ./appimagetool-x86_64.AppImage -n ../blah.AppDir blah.AppImage
+		echo "Read the build script. I am to lazy to make your architecture work"
+		exit 0
 	fi
-
 fi
 
 if [[ $1 == "run" ]]; then
