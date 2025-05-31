@@ -346,11 +346,51 @@ static int lua_sdl_poll_event(lua_State *L) {
 			lua_settable(L, -3);
 		}
 
+		if (event.type == SDL_EVENT_TEXT_INPUT) {
+			lua_pushstring(L, "text");
+			lua_pushstring(L, event.text.text);
+			lua_settable(L, -3);
+		}
+
 		return 1;
 	}
 	
 	lua_pushnil(L);
 	return 1;
+}
+
+static int lua_sdl_start_text_input(lua_State *L) {
+	SDL_Window **window = luaL_checkudata(L, 1, "SDL_Window");
+	if (!*window) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Not a window");
+		return 2;
+	}
+
+	if (!SDL_StartTextInput(*window)) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
+
+	return 0;
+}
+
+static int lua_sdl_stop_text_input(lua_State *L) {
+	SDL_Window **window = luaL_checkudata(L, 1, "SDL_Window");
+	if (!*window) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Not a window");
+		return 2;
+	}
+
+	if (!SDL_StopTextInput(*window)) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
+
+	return 0;
 }
 
 static const struct luaL_Reg sdl_funcs[] = {
@@ -375,6 +415,8 @@ static const struct luaL_Reg sdl_funcs[] = {
 	{"close_font", lua_sdl_ttf_close_font},
 	{"poll_event", lua_sdl_poll_event},
 	{"frect", lua_sdl_create_frect},
+	{"start_text_input", lua_sdl_start_text_input},
+	{"stop_text_input", lua_sdl_stop_text_input},
 	{NULL, NULL}
 };
 

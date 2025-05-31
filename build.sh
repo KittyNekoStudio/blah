@@ -1,8 +1,7 @@
 #!/bin/sh
 
 if [[ $1 == "nob" ]]; then
-	cd build
-	./blah.AppImage
+	./build/blah.AppImage
 	exit 0
 fi
 
@@ -34,5 +33,6 @@ if [[ -d build/ ]]; then
 fi
 
 if [[ $1 == "run" ]]; then
-	./blah.AppImage
+	cd ..
+	./build/blah.AppImage
 fi
