@@ -19,4 +19,8 @@ function cursor.move_down()
 	cursor.y = cursor.y + 1
 end
 
+function cursor.check_bounds(xbound)
+	if cursor.x > xbound then cursor.x = xbound + 1 end
+end
+
 return cursor

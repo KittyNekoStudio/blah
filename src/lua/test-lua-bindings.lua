@@ -75,7 +75,23 @@ while not quit do
 				else
 					lines[offsety] = "\0"
 				end
+			else
+				if offsety ~= 1 then
+					local line = lines[offsety]
+					lines[offsety - 1] = lines[offsety - 1] .. line
+					table.remove(lines, offsety)
+					offsety = offsety - 1
+					cursor.x = #lines[offsety] + 1
+				end
 			end
+		end
+		if event.key == 40 then
+			local line = lines[offsety]
+			local newline1 = line:sub(1, cursor.x)
+			local newline2 = line:sub(cursor.x + 1)
+			lines[offsety] = newline1
+			if newline2 == "" then newline2 = "\0" end
+			table.insert(lines, offsety + 1, newline2)
 		end
 		if event.type == 771 then
 			insert_char(event.text)
@@ -84,6 +100,8 @@ while not quit do
 			quit = true
 		end
 	end
+
+	cursor.check_bounds(#lines[offsety])
 
 	sdl.set_draw_color(renderer, sdl.color(0, 0, 0, 255))
 	sdl.render_clear(renderer)
