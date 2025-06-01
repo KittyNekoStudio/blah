@@ -1,6 +1,8 @@
 local cursor = {
 	x = 1,
 	y = 1,
+	w = 12,
+	h = 20,
 }
 
 function cursor.move_right()

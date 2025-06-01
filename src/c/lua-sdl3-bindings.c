@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <lua.h>
@@ -352,6 +353,12 @@ static int lua_sdl_poll_event(lua_State *L) {
 			lua_settable(L, -3);
 		}
 
+		if (event.key.mod == SDL_KMOD_LCTRL | event.key.mod == SDL_KMOD_RCTRL) {
+			lua_pushstring(L, "mod");
+			lua_pushnumber(L, event.key.mod);
+			lua_settable(L, -3);
+		}
+
 		return 1;
 	}
 	
@@ -393,6 +400,22 @@ static int lua_sdl_stop_text_input(lua_State *L) {
 	return 0;
 }
 
+static int lua_sdl_render_rect(lua_State *L) {
+	SDL_Renderer **renderer = luaL_checkudata(L, 1, "SDL_Renderer");
+	if (!*renderer) {
+		lua_pushnil(L);
+		lua_pushstring(L, "Renderer not provided");
+		return 2;
+	}
+	SDL_FRect *rect = luaL_checkudata(L, 2, "SDL_FRect");
+	if (!SDL_RenderFillRect(*renderer, rect)) {
+		lua_pushnil(L);
+		lua_pushstring(L, SDL_GetError());
+		return 2;
+	}
+	return 0;
+}
+
 static const struct luaL_Reg sdl_funcs[] = {
 	{"init", lua_sdl_init},
 	{"quit", lua_sdl_quit},
@@ -417,6 +440,7 @@ static const struct luaL_Reg sdl_funcs[] = {
 	{"frect", lua_sdl_create_frect},
 	{"start_text_input", lua_sdl_start_text_input},
 	{"stop_text_input", lua_sdl_stop_text_input},
+	{"render_rect", lua_sdl_render_rect},
 	{NULL, NULL}
 };
 

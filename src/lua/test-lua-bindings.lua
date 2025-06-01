@@ -37,6 +37,7 @@ for line in file_lines do
 	table.insert(lines, line)
 end
 
+if #lines == 0 then lines[1] = "\0" end
 local offsety = 1
 
 local function insert_char(char)
@@ -124,6 +125,8 @@ while not quit do
 		i = i + 1
 	end
 
+	sdl.set_draw_color(renderer, sdl.color(255, 255, 255, 255))
+	sdl.render_rect(renderer, sdl.frect(cursor.x * 11, cursor.y, cursor.w, cursor.h))
 	sdl.render_present(renderer)
 end
 
