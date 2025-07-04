@@ -1,21 +1,27 @@
 package com.blah;
 
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 
 public class Blah extends Application {
 
+	public Blah() {
+
+	}
+
 	@Override
 	public void start(Stage stage) {
-		var javaVersion = SystemInfo.javaVersion();
-		var javafxVersion = SystemInfo.javafxVersion();
+		var color = new Color(0.0, 0.0, 1.0, 1.0);
+		var circle = new Circle(40, 40, 30, color);
+		var circle2 = new Circle(500, 300, 30, color);
+		var root = new Group(circle, circle2);
+		var scene = new Scene(root, 800, 800);
 
-		var label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
-		var scene = new Scene(new StackPane(label), 640, 480);
 		stage.setScene(scene);
 		stage.show();
 	}

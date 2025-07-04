@@ -1,4 +1,4 @@
 module com.blah {
-    requires javafx.controls;
+    requires transitive javafx.controls;
     exports com.blah;
 }
