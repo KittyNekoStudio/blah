@@ -1,6 +1,6 @@
 # What is blah?
 
-blah is a text editor built on top of a terminal emulator.
+blah is a gui text editor made in Java.
 
 [Roadmap](/docs/blah-roadmap.md)
 
@@ -12,9 +12,7 @@ needs of anyone but mine.
 
 ## What technology will blah use?
 
-blah will be made with C and lua, using [SDL3](https://wiki.libsdl.org/SDL3/FrontPage)
-for windowing and graphics. The core will be made using C while everything else
-will be made with lua.
+blah will be made with Java and JavaFX.
 
 ## What features will blah have?
 
@@ -27,9 +25,9 @@ instead of an interpreter.
 
 blah plans to have:
 
-- A fully featured text editor
-- Interaction with a shell to run any program you want
-- A robust plugin system to extend blah however you want
+* A fully featured text editor
+* Interaction with a shell to run any program you want
+* A robust plugin system to extend blah however you want
 
 ## Who is this for?
 
