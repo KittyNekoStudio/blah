@@ -2,13 +2,14 @@ This is an outline for the [blah](../README.md) text editor.
 Listed in order of priorities.
 
 # MPV
-* [ ] Create JavaFX app
-* [ ] Be able to input text
-* [ ] Be able to save text to a file
-* [ ] Be able to open a file
+* [x] Create JavaFX app
+* [x] Be able to input text
+* [x] Be able to save text to a file
+* [x] Be able to open a file
 
 ##  Basic completion
 * [ ] Add Vim motions
+* [ ] Add a command mode to replace the menu bar
 * [ ] Create modes based on file types
 * [ ] Show line numbers
 * [ ] Create a status bar showing the file name, file type, file line amount
@@ -23,8 +24,11 @@ Listed in order of priorities.
 
 ## Customization
 * [ ] Add support for YAML as metadata for markdown notes
-* [ ] Add support for Grovvy as plugin language and configuration language
+* [ ] Add support for Groovy as a plugin language and configuration language
 * [ ] Add plugin system
 
 ## Terminal integration
 * [ ] Make blah interface with a shell
+
+## Advanced features
+* [ ] Make the editor's looks completely customizable
