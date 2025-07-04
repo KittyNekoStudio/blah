@@ -11,7 +11,10 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -20,9 +23,16 @@ public class Editor {
 	private TextArea textArea;
 	private Stage stage;
 	private String currentFileName = null;
+	private Modes mode;
+	private boolean checkedMode = false;
+	public enum Modes {
+		INSERT,
+		NORMAL
+	}
 
 	public Editor(Stage stage) {
 		this.stage = stage;
+		this.mode = Modes.NORMAL;
 
 		var textArea = new TextArea();
 		this.textArea = textArea;
@@ -38,6 +48,32 @@ public class Editor {
 		root.setCenter(textArea);
 
 		var scene = new Scene(root, 800, 800);
+
+		textArea.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
+			var keyCode = key.getCode();
+			if (keyCode == KeyCode.I && this.mode == Modes.NORMAL) {
+				this.mode = Modes.INSERT;
+				checkedMode = false;
+				// TODO! change this to just escape
+			} else if (keyCode == KeyCode.CAPS | keyCode == KeyCode.ESCAPE && this.mode == Modes.INSERT) { 
+				this.mode = Modes.NORMAL;
+				checkedMode = false;
+			}
+		});
+
+		textArea.addEventFilter(KeyEvent.ANY, (e) -> {
+			if (checkedMode == false && isNormal()) {
+				textArea.setEditable(false);
+				checkedMode = true;
+			}
+
+			if (checkedMode == false && isInsert()) {
+				textArea.setEditable(true);
+				checkedMode = true;
+				// We consume otherwise it would print the character 'i' to the textArea
+				e.consume();
+			}
+		});
 
 		this.stage.setScene(scene);
 	}
@@ -103,4 +139,15 @@ public class Editor {
 		}
 	}
 
+	public Modes getMode() {
+		return this.mode;
+	}
+
+	public boolean isNormal() {
+		return getMode() == Modes.NORMAL;
+	}
+
+	public boolean isInsert() {
+		return getMode() == Modes.INSERT;
+	}
 }

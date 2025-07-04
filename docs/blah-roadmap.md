@@ -15,6 +15,7 @@ Listed in order of priorities.
 * [ ] Create a status bar showing the file name, file type, file line amount
 * [ ] Add having multiple files open at the same time
 * [ ] Add ability to open images
+* [ ] Add undo
 
 ## Markdown support
 * [ ] Have advance syntax highlighting for markdown mode
